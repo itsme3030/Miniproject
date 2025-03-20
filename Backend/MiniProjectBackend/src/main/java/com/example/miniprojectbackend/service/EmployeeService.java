@@ -1,7 +1,9 @@
 package com.example.miniprojectbackend.service;
 
 import com.example.miniprojectbackend.model.Employee;
+import com.example.miniprojectbackend.model.Department;
 import com.example.miniprojectbackend.repository.EmployeeRepository;
+import com.example.miniprojectbackend.repository.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,16 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
     public Employee createEmployee(Employee employee) {
+        Department department = employee.getDepartment();
+        if (department != null && department.getId() != null) {
+            department = departmentRepository.findById(department.getId())
+                    .orElseThrow(() -> new RuntimeException("Department not found"));
+            employee.setDepartment(department);
+        }
         return employeeRepository.save(employee);
     }
 
@@ -28,18 +39,21 @@ public class EmployeeService {
 
     public Optional<Employee> updateEmployee(Long id, Employee newEmployeeData) {
         return employeeRepository.findById(id).map(existingEmployee -> {
-            // Update common fields
             existingEmployee.setFirstName(newEmployeeData.getFirstName());
             existingEmployee.setLastName(newEmployeeData.getLastName());
             existingEmployee.setEmail(newEmployeeData.getEmail());
-
-            // Update IT-specific fields
             existingEmployee.setJobTitle(newEmployeeData.getJobTitle());
-            existingEmployee.setDepartment(newEmployeeData.getDepartment());
             existingEmployee.setPhoneNumber(newEmployeeData.getPhoneNumber());
             existingEmployee.setHireDate(newEmployeeData.getHireDate());
             existingEmployee.setSalary(newEmployeeData.getSalary());
             existingEmployee.setSkills(newEmployeeData.getSkills());
+
+            // Handle department update
+            if (newEmployeeData.getDepartment() != null && newEmployeeData.getDepartment().getId() != null) {
+                Department department = departmentRepository.findById(newEmployeeData.getDepartment().getId())
+                        .orElseThrow(() -> new RuntimeException("Department not found"));
+                existingEmployee.setDepartment(department);
+            }
 
             return employeeRepository.save(existingEmployee);
         });
