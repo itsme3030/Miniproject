@@ -14,31 +14,37 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    // Create a new employee
     public Employee createEmployee(Employee employee) {
         return employeeRepository.save(employee);
     }
 
-    // Get all employees
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
 
-    // Get employee by ID
     public Optional<Employee> getEmployeeById(Long id) {
         return employeeRepository.findById(id);
     }
 
-    // Update employee by ID
-    public Optional<Employee> updateEmployee(Long id, Employee employee) {
-        if (employeeRepository.existsById(id)) {
-            employee.setId(id); // Ensure the ID is not changed
-            return Optional.of(employeeRepository.save(employee));
-        }
-        return Optional.empty();
+    public Optional<Employee> updateEmployee(Long id, Employee newEmployeeData) {
+        return employeeRepository.findById(id).map(existingEmployee -> {
+            // Update common fields
+            existingEmployee.setFirstName(newEmployeeData.getFirstName());
+            existingEmployee.setLastName(newEmployeeData.getLastName());
+            existingEmployee.setEmail(newEmployeeData.getEmail());
+
+            // Update IT-specific fields
+            existingEmployee.setJobTitle(newEmployeeData.getJobTitle());
+            existingEmployee.setDepartment(newEmployeeData.getDepartment());
+            existingEmployee.setPhoneNumber(newEmployeeData.getPhoneNumber());
+            existingEmployee.setHireDate(newEmployeeData.getHireDate());
+            existingEmployee.setSalary(newEmployeeData.getSalary());
+            existingEmployee.setSkills(newEmployeeData.getSkills());
+
+            return employeeRepository.save(existingEmployee);
+        });
     }
 
-    // Delete employee by ID
     public boolean deleteEmployee(Long id) {
         if (employeeRepository.existsById(id)) {
             employeeRepository.deleteById(id);
