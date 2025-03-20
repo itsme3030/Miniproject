@@ -1,9 +1,7 @@
 package com.example.miniprojectbackend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
 @Entity
@@ -17,11 +15,15 @@ public class Employee {
     private String lastName;
     private String email;
     private String jobTitle;
-    private String department;
     private String phoneNumber;
     private LocalDate hireDate;
     private Double salary;
     private String skills; // Comma-separated list of skills
+
+    // Many employees can belong to one department
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id") // Foreign key to the department table
+    private Department department;
 
     // Getters and Setters
 
@@ -67,14 +69,6 @@ public class Employee {
         this.jobTitle = jobTitle;
     }
 
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -105,5 +99,13 @@ public class Employee {
 
     public void setSkills(String skills) {
         this.skills = skills;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 }
