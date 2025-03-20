@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Typography, Button, TextField, Box, MenuItem, Grid } from '@mui/material';
 import { getAllEmployees, createEmployee, updateEmployee, deleteEmployee } from './EmployeeService';
 import { getAllDepartments } from './DepartmentService';
 
@@ -15,7 +14,7 @@ function EmployeeSection() {
     hireDate: '',
     salary: '',
     skills: '',
-    departmentId: ''
+    departmentId: '',
   });
   const [editId, setEditId] = useState(null);
 
@@ -25,25 +24,37 @@ function EmployeeSection() {
   }, []);
 
   const fetchEmployees = async () => {
-    const data = await getAllEmployees();
-    setEmployees(data);
+    try {
+      const data = await getAllEmployees();
+      setEmployees(data);
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+    }
   };
 
   const fetchDepartments = async () => {
-    const data = await getAllDepartments();
-    setDepartments(data);
+    try {
+      const data = await getAllDepartments();
+      setDepartments(data);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const employeeData = { ...formData, department: { id: formData.departmentId } };
-    if (editId) {
-      await updateEmployee(editId, employeeData);
-    } else {
-      await createEmployee(employeeData);
+    try {
+      if (editId) {
+        await updateEmployee(editId, employeeData);
+      } else {
+        await createEmployee(employeeData);
+      }
+      resetForm();
+      fetchEmployees();
+    } catch (error) {
+      console.error('Error saving employee:', error);
     }
-    resetForm();
-    fetchEmployees();
   };
 
   const handleEdit = (emp) => {
@@ -56,14 +67,18 @@ function EmployeeSection() {
       hireDate: emp.hireDate || '',
       salary: emp.salary || '',
       skills: emp.skills || '',
-      departmentId: emp.department ? emp.department.id : ''
+      departmentId: emp.department ? emp.department.id : '',
     });
     setEditId(emp.id);
   };
 
   const handleDelete = async (id) => {
-    await deleteEmployee(id);
-    fetchEmployees();
+    try {
+      await deleteEmployee(id);
+      fetchEmployees();
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+    }
   };
 
   const resetForm = () => {
@@ -76,59 +91,136 @@ function EmployeeSection() {
       hireDate: '',
       salary: '',
       skills: '',
-      departmentId: ''
+      departmentId: '',
     });
     setEditId(null);
   };
 
   return (
-    <Box>
-      <Typography variant="h5" sx={{ color: '#1565c0', marginBottom: 2 }}>Manage Employees</Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 2, marginBottom: 3 }}>
-        <TextField label="First Name" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} required />
-        <TextField label="Last Name" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} required />
-        <TextField label="Email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
-        <TextField label="Job Title" value={formData.jobTitle} onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })} />
-        <TextField label="Phone Number" value={formData.phoneNumber} onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })} />
-        <TextField label="Hire Date" type="date" value={formData.hireDate} onChange={(e) => setFormData({ ...formData, hireDate: e.target.value })} InputLabelProps={{ shrink: true }} />
-        <TextField label="Salary" type="number" value={formData.salary} onChange={(e) => setFormData({ ...formData, salary: e.target.value })} />
-        <TextField label="Skills" value={formData.skills} onChange={(e) => setFormData({ ...formData, skills: e.target.value })} helperText="Comma separated" />
-        <TextField
-          select
-          label="Department"
+    <div>
+      <h2 style={{ color: '#1565c0' }}>Manage Employees</h2>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '1rem',
+          marginBottom: '1rem',
+        }}
+      >
+        <input
+          type="text"
+          placeholder="First Name"
+          value={formData.firstName}
+          onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+          required
+          style={{ padding: '0.5rem' }}
+        />
+        <input
+          type="text"
+          placeholder="Last Name"
+          value={formData.lastName}
+          onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+          required
+          style={{ padding: '0.5rem' }}
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
+          style={{ padding: '0.5rem' }}
+        />
+        <input
+          type="text"
+          placeholder="Job Title"
+          value={formData.jobTitle}
+          onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+          style={{ padding: '0.5rem' }}
+        />
+        <input
+          type="text"
+          placeholder="Phone Number"
+          value={formData.phoneNumber}
+          onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+          style={{ padding: '0.5rem' }}
+        />
+        <input
+          type="date"
+          placeholder="Hire Date"
+          value={formData.hireDate}
+          onChange={(e) => setFormData({ ...formData, hireDate: e.target.value })}
+          style={{ padding: '0.5rem' }}
+        />
+        <input
+          type="number"
+          placeholder="Salary"
+          value={formData.salary}
+          onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+          style={{ padding: '0.5rem' }}
+        />
+        <input
+          type="text"
+          placeholder="Skills (comma separated)"
+          value={formData.skills}
+          onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+          style={{ padding: '0.5rem' }}
+        />
+        <select
           value={formData.departmentId}
           onChange={(e) => setFormData({ ...formData, departmentId: e.target.value })}
           required
+          style={{ padding: '0.5rem' }}
         >
-          <MenuItem value="">Select Department</MenuItem>
+          <option value="">Select Department</option>
           {departments.map((dept) => (
-            <MenuItem key={dept.id} value={dept.id}>{dept.name}</MenuItem>
+            <option key={dept.id} value={dept.id}>
+              {dept.name}
+            </option>
           ))}
-        </TextField>
-        <Box sx={{ gridColumn: 'span 2' }}>
-          <Button variant="contained" color="primary" type="submit" fullWidth>
+        </select>
+        <div style={{ gridColumn: 'span 2' }}>
+          <button type="submit" style={{ padding: '0.5rem 1rem', width: '100%' }}>
             {editId ? 'Update Employee' : 'Create Employee'}
-          </Button>
-        </Box>
-      </Box>
-      <Grid container spacing={2}>
+          </button>
+        </div>
+      </form>
+      {/* Use CSS Grid for employee listing */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: '1rem',
+        }}
+      >
         {employees.map((emp) => (
-          <Grid item xs={12} sm={6} md={4} key={emp.id}>
-            <Card sx={{ backgroundColor: '#e3f2fd', borderRadius: 2, boxShadow: 2 }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ color: '#0d47a1' }}>{emp.firstName} {emp.lastName}</Typography>
-                <Typography variant="body2" sx={{ color: '#1976d2' }}>{emp.jobTitle}</Typography>
-                <Typography variant="caption" sx={{ color: '#1565c0' }}>{emp.email}</Typography>
-                <Box sx={{ marginTop: 1, display: 'flex', justifyContent: 'space-between' }}>
-                  <Button size="small" variant="outlined" onClick={() => handleEdit(emp)}>Edit</Button>
-                  <Button size="small" variant="outlined" color="error" onClick={() => handleDelete(emp.id)}>Delete</Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+          <div
+            key={emp.id}
+            style={{
+              border: '1px solid #ccc',
+              borderRadius: '8px',
+              padding: '1rem',
+              backgroundColor: '#e3f2fd',
+            }}
+          >
+            <h3 style={{ color: '#0d47a1' }}>
+              {emp.firstName} {emp.lastName}
+            </h3>
+            <p style={{ color: '#1976d2' }}>{emp.jobTitle}</p>
+            <p style={{ color: '#1565c0' }}>{emp.email}</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <button onClick={() => handleEdit(emp)} style={{ padding: '0.25rem 0.5rem' }}>
+                Edit
+              </button>
+              <button onClick={() => handleDelete(emp.id)} style={{ padding: '0.25rem 0.5rem', color: 'red' }}>
+                Delete
+              </button>
+            </div>
+          </div>
         ))}
-      </Grid>
-    </Box>
+      </div>
+    </div>
   );
 }
 

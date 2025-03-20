@@ -1,7 +1,7 @@
 package com.example.miniprojectbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 
 @Entity
@@ -22,7 +22,8 @@ public class Employee {
 
     // Many employees can belong to one department
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id") // Foreign key to the department table
+    @JoinColumn(name = "department_id")
+    @JsonBackReference
     private Department department;
 
     // Getters and Setters
@@ -58,8 +59,6 @@ public class Employee {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    // New field getters and setters
 
     public String getJobTitle() {
         return jobTitle;

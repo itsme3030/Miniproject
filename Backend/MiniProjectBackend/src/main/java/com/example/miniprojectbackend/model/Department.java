@@ -1,5 +1,6 @@
 package com.example.miniprojectbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -15,9 +16,11 @@ public class Department {
 
     // One department has many employees
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Employee> employees;
 
     // Getters and Setters
+
     public Long getId() {
         return id;
     }

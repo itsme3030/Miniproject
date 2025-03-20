@@ -1,6 +1,7 @@
 package com.example.miniprojectbackend.controller;
 
 import com.example.miniprojectbackend.model.Department;
+import com.example.miniprojectbackend.model.Employee;
 import com.example.miniprojectbackend.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,14 +36,16 @@ public class DepartmentController {
     @GetMapping("/{id}")
     public ResponseEntity<Department> getDepartmentById(@PathVariable Long id) {
         Optional<Department> department = departmentService.getDepartmentById(id);
-        return department.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return department.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Update department by ID
     @PutMapping("/{id}")
     public ResponseEntity<Department> updateDepartment(@PathVariable Long id, @RequestBody Department department) {
         Optional<Department> updatedDepartment = departmentService.updateDepartment(id, department);
-        return updatedDepartment.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return updatedDepartment.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Delete department by ID
@@ -50,6 +53,17 @@ public class DepartmentController {
     public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
         if (departmentService.deleteDepartment(id)) {
             return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    // NEW: Get employees by department ID
+    @GetMapping("/{id}/employees")
+    public ResponseEntity<List<Employee>> getEmployeesByDepartment(@PathVariable Long id) {
+        Optional<Department> departmentOpt = departmentService.getDepartmentById(id);
+        if (departmentOpt.isPresent()) {
+            List<Employee> employees = departmentOpt.get().getEmployees();
+            return new ResponseEntity<>(employees, HttpStatus.OK);
         }
         return ResponseEntity.notFound().build();
     }

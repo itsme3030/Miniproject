@@ -1,20 +1,33 @@
 import React from 'react';
-import { Container, Typography, Divider, Box } from '@mui/material';
 import DepartmentSection from './DepartmentSection';
 import EmployeeSection from './EmployeeSection';
 
 function App() {
   return (
-    <Container maxWidth="lg" sx={{ padding: '2rem', backgroundColor: '#fff0f6', minHeight: '100vh' }}>
-      <Typography variant="h3" component="h1" align="center" gutterBottom sx={{ fontFamily: 'Comic Sans MS, cursive', color: '#d81b60' }}>
+    <div
+      style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '2rem',
+        backgroundColor: '#fff0f6',
+        minHeight: '100vh',
+      }}
+    >
+      <h1
+        style={{
+          fontFamily: 'Comic Sans MS, cursive',
+          color: '#d81b60',
+          textAlign: 'center',
+        }}
+      >
         Department & Employee Management
-      </Typography>
-      <Divider sx={{ marginBottom: '2rem', borderColor: '#f8bbd0' }} />
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      </h1>
+      <hr style={{ marginBottom: '2rem', borderColor: '#f8bbd0' }} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         <DepartmentSection />
         <EmployeeSection />
-      </Box>
-    </Container>
+      </div>
+    </div>
   );
 }
 
